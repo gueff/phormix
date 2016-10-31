@@ -1,0 +1,144 @@
+{
+    "name": "Comment",
+    "action": "",
+    "method": "post",
+    "enctype": "",
+    
+    "element": [
+        {
+            "label": "Name",
+            "tag": "input",
+            "attribute": {
+                "name": "Name",
+                "type": "text",
+                "value": "",
+                "title": "Name",
+                "placeholder": "Name",
+                "required": true
+            },
+            "filter": {
+                "validate": {
+                    "minLength": {
+                        "value": 3,
+                        "message": {
+                            "fail": "Please enter at least %s characters.",
+                            "success": "You have specified more than the required minimum amount of %s characters."
+                        }
+                    },
+                    "empty": {
+                        "value": false,
+                        "message": {
+                            "fail": "This field can not be empty. Please fill in."
+                        }
+                    },
+                    "regex": {
+                        "value": "/^[\\p{L}\\p{Zs}\\p{M}\\p{Pd}\\p{Ps}\\p{Pe}\\p{Pc}.]+$/u",
+                        "message": {
+                            "fail": "Your entry includes not authorized characters",
+                            "success": "Your entry includes only authorized characters."
+                        }
+                    }
+                },
+                "sanitize": {
+                    "maxlength": {
+                        "value": 50,
+                        "message": {
+                            "fail": "The maximum length is %s characters . The input was reduced accordingly.",
+                            "success": "The maximum length of % s characters has not been exceeded."
+                        }
+                    },
+                    "regex": {
+                        "value": "/[^\\p{L}\\p{Zs}\\p{M}\\p{Pd}\\p{Ps}\\p{Pe}\\p{Pc}.]/u",
+                        "message": {
+                            "fail": "Disvalued characters removed.",
+                            "success": "The entry must not be cleaned."
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "label": "E-Mail",
+            "tag": "imput",
+            "attribute": {
+                "name": "mail",
+                "type": "email",
+                "value": "",
+                "title": "foo@example.com",
+                "placeholder": "foo@example.com",
+                "required": true
+            },
+            "filter": {
+                "validate": {
+                    "email": {
+                        "value": {
+                            "checkMX": true,
+                            "checkUserExists": false
+                        },
+                        "message": {
+                            "fail": "The given e-mail address is not valid."
+                        }
+                    },
+                    "empty": {
+                        "value": false
+                    }
+                },
+                "sanitize": {
+                    "maxlength": {
+                        "value": 100,
+                        "message": {
+                            "fail": "The maximum length is %s characters . The input was reduced accordingly.",
+                            "success": "The maximum length of % s characters has not been exceeded."
+                        }
+                    },
+                    "email": {
+                        "value": true
+                    }
+                }
+            }
+        },
+        {
+            "label": "Comment",
+            "tag": "textarea",
+            "attribute": {
+                "name": "comment",
+                "value": "",
+                "title": "no Tags, but Chars or Numbers and simple punctuation marks. URLs are allowed.",
+                "placeholder": "Comment",
+                "required": true
+            },
+            "filter": {
+                "validate": {
+                    "minLength": {
+                        "value": 1,
+                        "message": {
+                            "fail": "Please enter at least %s characters.",
+                            "success": "You have specified more than the required minimum amount of %s characters."
+                        }
+                    },
+                    "empty": {
+                        "value": false,
+                        "message": {
+                            "fail": "This field can not be empty. Please fill in."
+                        }
+                    },
+                    "regex": {
+                        "value": "/^[\\w\\d\\p{L}\\p{Zs}\\p{N}\\p{M}\\p{Pd}\\p{Pc}\\p{Ps}\\p{Pe}.:,?!&\\/\\n\\r]+$/u",
+                        "message": {
+                            "fail": "Your entry includes not authorized characters",
+                            "success": "Your entry includes only authorized characters."
+                        }
+                    }
+                },
+                "sanitize": {
+                    "maxlength": {
+                        "value": 1000
+                    },
+                    "regex": {
+                        "value": "/[^\\w\\d\\p{L}\\p{Zs}\\p{N}\\p{M}\\p{Pd}\\p{Ps}\\p{Pe}\\p{Pc}.:,?!&\\/\\n\\r]/u"
+                    }
+                }
+            }
+        }
+    ]
+}
