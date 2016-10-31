@@ -6,39 +6,33 @@
  * @package Phormix
  * @copyright ueffing.net
  * @author Guido K.B.W. Üffing <info@ueffing.net>
- * @license GNU GENERAL PUBLIC LICENSE Version 3. See application/doc/COPYING
+ * @license GNU GENERAL PUBLIC LICENSE Version 3. See doc/COPYING
  */
-
-/**
- * @name $PhormixModel
- */
-//namespace Phormix\Model;
-
 
 /**
  * Phormix
  *
  * Examples:
- *      $oPhormix = new \Phormix\Model\Phormix();
+ *      $oPhormix = new Phormix();
  *      $oPhormix->init('/var/www/App/formular.json')
  *          ->run();
  *
- *      $oPhormix = new \Phormix\Model\Phormix();
+ *      $oPhormix = new Phormix();
  *      $oPhormix->setSessionPrefix('myPhormixCheck')
  *          ->init('/var/www/App/formular.json')
  *          ->run();
  *
- *      $oPhormix = new \Phormix\Model\Phormix();
+ *      $oPhormix = new Phormix();
  *      $oPhormix->setConfigArrayFromJsonFile($sAbsPathToConfigFile)
  *          ->setIdentifier($sIdentifier)
  *          ->run();
  *
- *      $oPhormix = new \Phormix\Model\Phormix();
+ *      $oPhormix = new Phormix();
  *      $oPhormix->setConfigArray($sAbsPathToConfigFile)
  *          ->setIdentifier($sIdentifier)
  *          ->run();
  *
- *      $oPhormix = new \Phormix\Model\Phormix();
+ *      $oPhormix = new Phormix();
  *      $oPhormix->setSessionPrefix('myPhormixCheck')
  *          ->setConfigArray($sAbsPathToConfigFile)
  *          ->setIdentifier($sIdentifier)
