@@ -14,7 +14,7 @@ Erstelle die Datei comnposer.json mit folgendem Inhalt:
 ~~~
 {
     "require": {
-        "gueff/mymvc":"dev-master"
+        "gueff/phormix":"dev-master"
     }
 }
 ~~~
@@ -41,7 +41,7 @@ create the comnposer.json file with following content:
 ~~~
 {
     "require": {
-        "gueff/mymvc":"dev-master"
+        "gueff/phormix":"dev-master"
     }
 }
 ~~~
