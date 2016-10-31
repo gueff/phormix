@@ -107,13 +107,13 @@ class Phormix
      * name of validate class
      * @var string
      */
-    private $_sValidate = 'PhormixValidate';
+    private $_sValidate = '\PhormixValidate';
     
     /**
      * name of sanitize class
      * @var string
      */
-    private $_sSanitize = 'PhormixSanitize';
+    private $_sSanitize = '\PhormixSanitize';
     
     /**
      * prefix of methods in validate & sanitize classes
