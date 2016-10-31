@@ -9,7 +9,7 @@
 **Check HTML-Forms with Phormix**
 
 ## Installation
-create the comnposer.json file with following content:
+create the composer.json file with following content:
 ~~~
 {
     "require": {
@@ -23,7 +23,7 @@ $ composer install
 ~~~
 
 ## Process
-- you create a configuration file (JSON), which describes the later HTML form
+- create a configuration file (JSON), which describes the later HTML form
 - Build the HTML Form
 - At backend* Phormix will check the transmitted data from the HTML form against the configuration
 
@@ -86,7 +86,7 @@ ___
 
 ## Installation
 
-Erstelle die Datei comnposer.json mit folgendem Inhalt:
+Erstelle die Datei composer.json mit folgendem Inhalt:
 ~~~
 {
     "require": {
@@ -101,7 +101,7 @@ $ composer install
 
 ## Ablauf
 
-- Man legt eine Konfiguration (JSON) an, in der das spätere HTML-Formular beschrieben wird. 
+- Eine Konfiguration (JSON) anlegen, in der das spätere HTML-Formular beschrieben wird
 - HTML-Formular bauen
 - Im Backend* wird das gesendete HTML-Formular mitels Phormix nun gegen die Konfiguration gecheckt.
 
