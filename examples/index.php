@@ -3,14 +3,14 @@
 function debug($mData){echo '<pre>' . print_r($mData, TRUE) . '</pre><hr />';}
 
 
-require_once '../Phormix/Model/Phormix.php';
-require_once '../Phormix/Model/Validate.php';
-require_once '../Phormix/Model/Sanitize.php';
+require_once '../Phormix.php';
+require_once '../PhormixValidate.php';
+require_once '../PhormixSanitize.php';
 
 
 // Phormix
 $oPhormix = new \Phormix\Model\Phormix();
-$oPhormix->init(realpath(__DIR__ . '/../') . '/Phormix/config/comment.json');
+$oPhormix->init('config/comment.json');
 $oPhormix->run();
 
 $aConfig = $oPhormix->getConfigArray();
