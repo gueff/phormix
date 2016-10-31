@@ -6,7 +6,7 @@
 
 <a id="DE"></a>[DE]
 
-**Formulare checken mit Phormix**
+**HTML-Formulare checken mit Phormix**
 
 ## Installation
 
@@ -33,7 +33,7 @@ _\*Entgegennehmende Stelle (Crontroller, PHP-Script o.a.)_
 
 <a id="EN"></a>[EN]
 
-**Check Formulars with Phormix**
+**Check HTML-Forms with Phormix**
 
 ## Installation
 
