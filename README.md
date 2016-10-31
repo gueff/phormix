@@ -8,6 +8,20 @@
 
 **Formulare checken mit Phormix**
 
+## Installation
+
+~~~
+{
+    "require": {
+        "gueff/mymvc":"dev-master"
+    }
+}
+~~~
+
+~~~
+$ composer install
+~~~
+
 ## Ablauf
 
 - Man legt eine Konfiguration (JSON) an, in der das spätere HTML-Formular beschrieben wird. 
@@ -20,6 +34,20 @@ _\*Entgegennehmende Stelle (Crontroller, PHP-Script o.a.)_
 <a id="EN"></a>[EN]
 
 **Check Formulars with Phormix**
+
+## Installation
+
+~~~
+{
+    "require": {
+        "gueff/mymvc":"dev-master"
+    }
+}
+~~~
+
+~~~
+$ composer install
+~~~
 
 ## Process
 - you create a configuration file (JSON), which describes the later HTML form
