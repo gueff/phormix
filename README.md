@@ -26,4 +26,4 @@ _\*Entgegennehmende Stelle (Crontroller, PHP-Script o.a.)_
 - Build the HTML Form
 - At backend Phormix will check the transmitted data from the HTML form against the configuration
 
-
+_\*Receiving Unit (Crontroller, PHP-Script o.a.)_
