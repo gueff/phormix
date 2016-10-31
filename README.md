@@ -10,6 +10,7 @@
 
 ## Installation
 
+Erstelle die Datei comnposer.json mit folgendem Inhalt:
 ~~~
 {
     "require": {
@@ -17,7 +18,7 @@
     }
 }
 ~~~
-
+Führe Installation durch
 ~~~
 $ composer install
 ~~~
@@ -36,7 +37,7 @@ _\*Entgegennehmende Stelle (Crontroller, PHP-Script o.a.)_
 **Check HTML-Forms with Phormix**
 
 ## Installation
-
+create the comnposer.json file with following content:
 ~~~
 {
     "require": {
@@ -44,7 +45,7 @@ _\*Entgegennehmende Stelle (Crontroller, PHP-Script o.a.)_
     }
 }
 ~~~
-
+run installation
 ~~~
 $ composer install
 ~~~
