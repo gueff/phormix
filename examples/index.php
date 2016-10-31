@@ -9,7 +9,7 @@ require_once '../PhormixSanitize.php';
 
 
 // Phormix
-$oPhormix = new \Phormix\Model\Phormix();
+$oPhormix = new \Phormix();
 $oPhormix->init('config/comment.json');
 $oPhormix->run();
 

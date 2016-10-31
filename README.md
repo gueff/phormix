@@ -36,13 +36,13 @@ Examples:
 ~~~php
 // instantiate, 
 // load config, run
-$oPhormix = new Phormix();
+$oPhormix = new \Phormix();
 $oPhormix->init('/var/www/App/formular.json')->run();
 
 // instantiate, 
 // set different session prefix,
 // load config, run
-$oPhormix = new Phormix();
+$oPhormix = new \Phormix();
 $oPhormix->setSessionPrefix('myPhormixCheck')
 ->init('/var/www/App/formular.json')
 ->run();
@@ -51,7 +51,7 @@ $oPhormix->setSessionPrefix('myPhormixCheck')
 // load config,
 // set a certain identifier
 // run
-$oPhormix = new Phormix();
+$oPhormix = new \Phormix();
 $oPhormix->setConfigArrayFromJsonFile($sAbsPathToConfigFile)
 ->setIdentifier($sIdentifier)
 ->run();
@@ -60,7 +60,7 @@ $oPhormix->setConfigArrayFromJsonFile($sAbsPathToConfigFile)
 // set a proper array as config,
 // set a certain identifier
 // run
-$oPhormix = new Phormix();
+$oPhormix = new \Phormix();
 $oPhormix->setConfigArray($aArray)
 ->setIdentifier($sIdentifier)
 ->run();
@@ -70,7 +70,7 @@ $oPhormix->setConfigArray($aArray)
 // set a proper array as config,
 // set a certain identifier
 // run
-$oPhormix = new Phormix();
+$oPhormix = new \Phormix();
 $oPhormix->setSessionPrefix('myPhormixCheck')
 ->setConfigArray($sAbsPathToConfigFile)
 ->setIdentifier($sIdentifier)
