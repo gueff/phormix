@@ -1,0 +1,10 @@
+{
+    "name": "gueff/Phormix",
+    "description": "HTML-Form Checker",
+    "license": "GPLv3",
+    "authors": [
+        {
+            "name": "Guido K.B.W. Ueffing"
+        }
+    ]
+}
