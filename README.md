@@ -25,7 +25,7 @@ $ composer install
 ## Process
 - you create a configuration file (JSON), which describes the later HTML form
 - Build the HTML Form
-- At backend Phormix will check the transmitted data from the HTML form against the configuration
+- At backend* Phormix will check the transmitted data from the HTML form against the configuration
 
 _\*Receiving Unit (Crontroller, PHP-Script o.a.)_
 
