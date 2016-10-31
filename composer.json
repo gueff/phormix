@@ -15,9 +15,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Phormix": "",
-            "PhormixSanitize": "",
-            "PhormixValidate": ""
+            "Phormix": ""
         }
     }
 }
