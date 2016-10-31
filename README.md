@@ -33,7 +33,7 @@ _\*Receiving Unit (Crontroller, PHP-Script o.a.)_
 ## Usage
 Examples:
 
-~~~bash
+~~~php
 // instantiate, 
 // load config, run
 $oPhormix = new Phormix();
