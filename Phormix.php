@@ -258,7 +258,7 @@ class Phormix
     }
 
     /**
-     * adds index to array
+     * adds an index to existing config array: key is the attribute:name of current element
      * @access private
      */
     private function _enrichConfig()
@@ -356,16 +356,18 @@ class Phormix
 	}
 
     /**
-     * returns array(config) of element(name)
+     * returns array(config) of complete element identified by its attribute key/value (first occurance wins)
+     * @example $aEmailConfig = getElementArrayByAttribute('name', 'email');
      * @access public
-     * @param string $sElement
+     * @param string $sAttributeKey e.g. 'name'
+     * @param string $sAttributeValue e.g. 'email'
      * @return array
      */
-	public function getElementArrayByName($sElement = '')
+	public function getElementArrayByAttribute($sAttributeKey = '', $sAttributeValue = '')
 	{
 		foreach ($this->_aConfig['element'] as $aValue)
 		{
-			if ($aValue['name'] === $sElement)
+			if (isset($aValue['attribute'][$sAttributeKey]) && $aValue['attribute'][$sAttributeKey] === $sAttributeValue)
 			{
 				return $aValue;
 			}
@@ -375,7 +377,27 @@ class Phormix
 	}
 
     /**
-     * sets array(config) for element(name)
+     * returns array(config) of complete element identified by its label (first occurance wins)
+     * @example $aEmailConfig = getElementArrayByLabel('E-Mail');
+     * @access public
+     * @param string $sLabel e.g. 'E-Mail'
+     * @return array
+     */
+	public function getElementArrayByLabel($sLabel = '')
+	{
+		foreach ($this->_aConfig['element'] as $aValue)
+		{
+			if (isset($aValue['label']) && $aValue['label'] === $sLabel)
+			{
+				return $aValue;
+			}
+		}
+
+		return array();
+	}    
+
+    /**
+     * sets array(config) for an element, identified by its attribute-name
      * @access public
      * @param string $sElement
      * @param array $aValue
