@@ -11,9 +11,10 @@
             "attribute": {
                 "name": "Salutation",
                 "type": "radio",
-                "value": "",
                 "title": "",
                 "placeholder": "Salutation",
+                "maxlength": 3,
+				"autofocus": true,
                 "required": true
             },
             "filter": {
@@ -21,14 +22,14 @@
                     "minLength": {
                         "value": 1,
                         "message": {
-                            "fail": "Please enter at least %s characters.",
+                            "fail": "Please choose at least %s option.",
                             "success": "You have specified more than the required minimum amount of %s characters."
                         }
                     },
                     "expect": {
                         "value": [
-                            "m",
-                            "f"
+                            "Mr",
+                            "Mrs"
                         ],
                         "message": {
                             "fail": "Invalid entry.",
@@ -51,7 +52,7 @@
                 },
                 "sanitize": {
                     "maxlength": {
-                        "value": 1,
+                        "value": 3,
                         "message": {
                             "fail": "The maximum length is %s characters . The input was reduced accordingly.",
                             "success": "The maximum length of % s characters has not been exceeded."
@@ -76,6 +77,7 @@
                 "value": "",
                 "title": "",
                 "placeholder": "Firstname",
+                "maxlength": 50,
                 "required": true
             },
             "filter": {

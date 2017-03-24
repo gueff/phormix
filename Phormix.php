@@ -122,6 +122,12 @@ class Phormix
      */
     protected $_sMethodPrefix = '_';
     
+	/**
+	 * contains checked form data
+	 * @var array
+	 */
+	private $_aFormDataChecked = array();
+	
     /**
      * Phormix constructor.
      * @access public
@@ -356,6 +362,16 @@ class Phormix
 	}
 
     /**
+     * returns data handled by check
+     * @access public
+     * @return array
+     */
+	public function getFormDataCheckedArray()
+	{
+        return $this->_aFormDataChecked;
+	}
+	
+    /**
      * returns array(config) of complete element identified by its attribute key/value (first occurance wins)
      * @example $aEmailConfig = getElementArrayByAttribute('name', 'email');
      * @access public
@@ -535,6 +551,8 @@ class Phormix
      */
 	public function check()
 	{	
+		$this->_aFormDataChecked = array();
+			
 		// check page/ticket
 		if (false === $this->_checkTicket($_SESSION[$this->_sSessionPrefix][$this->_sIdentifier]['ticket']))
 		{
@@ -546,7 +564,7 @@ class Phormix
 		{
             // if element has type=file, we need to look at $_FILES
 			$aFormData = (isset($aElement['attribute']['type']) && strtolower(trim($aElement['attribute']['type'])) === 'file') ? $_FILES : $this->getFormDataArray();
-            
+
 			// get element name
 			$sElementName = $aElement['attribute']['name'];
 			
@@ -561,7 +579,7 @@ class Phormix
                 
 				return false;
 			}
-			
+
 			// Validate
 			if	(
 						array_key_exists('required', $aElement['attribute']) 
@@ -606,6 +624,9 @@ class Phormix
 				}
 			}
 			
+			// add first time as the validates has been passed
+			$this->_aFormDataChecked[$sElementName] = $aFormData[$sElementName];
+			
 			// Sanitize
 			if	(
 						array_key_exists('filter', $aElement) 
@@ -624,10 +645,13 @@ class Phormix
                         $oReflectionClass = new \ReflectionClass($this->_sSanitize);
                         $oInstance =  $oReflectionClass->newInstanceWithoutConstructor();
                         $sSanitized = $oInstance->$sMyMthod($aFormData[$sElementName], $aSanitize['value']);                        
-                        
+                        $sIdentifier = (array_key_exists('label', $aElement)) ? $aElement['label'] : $aElement['name'];
+						
                         $aFormData[$sElementName] = $sSanitized;					
-                       
+						$this->_aFormDataChecked[$sElementName] = $sSanitized;
+						
                         $this->_aMessage[$aElement['attribute']['name']]['sanitize'][$sMyMthod] =  (array_key_exists('success', $aSanitize['message'])) ? '"' . $sIdentifier . '": ' . $aSanitize['message']['success'] : '`' . $aElement['label'] . '` is valid.';
+						self::LOG("SUCCESS\t" . 'Sanitize ' . $sMyMthod . '(' . $sElementName . ' =>  ' . $sKey . ': ' . json_encode($aSanitize) . '): `' . $sSanitized . '`');
                     }                    
 				}
 			}						
