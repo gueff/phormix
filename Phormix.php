@@ -106,17 +106,20 @@ class Phormix
     /**
      * name of validate class
      * @var string
+     * @access protected
      */
-    private $_sValidate = '\PhormixValidate';
+    protected $_sValidate = '\PhormixValidate';
     
     /**
      * name of sanitize class
      * @var string
+     * @access protected
      */
-    private $_sSanitize = '\PhormixSanitize';
+    protected $_sSanitize = '\PhormixSanitize';
     
     /**
      * prefix of methods in validate & sanitize classes
+     * (prefix is necessary to avoid misusing php-reserved words as methodnames; e.g. "empty")
      * @var string
      * @access protected
      */
@@ -125,9 +128,18 @@ class Phormix
 	/**
 	 * contains checked form data
 	 * @var array
+     * @access private
 	 */
 	private $_aFormDataChecked = array();
 	
+    /**
+     * array containing sent data by form
+     * @var array
+     * @access protected
+     */
+    protected $_aFormData = array();   
+    
+    
     /**
      * Phormix constructor.
      * @access public
@@ -142,7 +154,7 @@ class Phormix
      * @access public
      * @param string $sAbsPathToConfigFile absolute Path to configFile (JSON)
      * @param string $sIdentifier Identifier | Default=md5($sAbsPathToConfigFile)
-     * @return $this
+     * @return \Phormix
      */
 	public function init($sAbsPathToConfigFile = '', $sIdentifier = '')
     {
@@ -155,6 +167,7 @@ class Phormix
     /**
      * runs check, renews ticket, saves to session
      * @access public
+     * @return \Phormix
      */
 	public function run()
     {
@@ -170,6 +183,11 @@ class Phormix
 
         // save to session
         $this->_setSessionInfos();
+        
+        // overwrite global
+        $GLOBALS['_' . strtoupper($this->_aConfig['attribute']['method'])] = $this->getFormDataArray();
+            
+        return $this;
     }
 
     /**
@@ -196,7 +214,7 @@ class Phormix
      * sets config array
      * @access public
      * @param array $aConfig
-     * @return $this
+     * @return \Phormix
      */
 	public function setConfigArray(array $aConfig = array())
     {
@@ -209,7 +227,7 @@ class Phormix
      * sets config array from a config JSON file
      * @access public
      * @param string $sAbsPathToConfigFile
-     * @return $this
+     * @return \Phormix
      */
     public function setConfigArrayFromJsonFile($sAbsPathToConfigFile = '')
     {
@@ -232,7 +250,7 @@ class Phormix
      * sets identifier
      * @access public
      * @param string $sIdentifier
-     * @return $this
+     * @return \Phormix
      */
     public function setIdentifier ($sIdentifier = '')
     {
@@ -347,20 +365,39 @@ class Phormix
     /**
      * returns data sent by form
      * @access public
-     * @return array|mixed
+     * @return array 
      */
 	public function getFormDataArray()
-	{
-        $aRequest = $GLOBALS['_' . strtoupper($this->_aConfig['method'])];
+	{        
+        if (!empty($this->_aFormData))
+        {
+            return $this->_aFormData;
+        }    
+ 
+        // get data sent by form
+        $aRequest = $GLOBALS['_' . strtoupper($this->_aConfig['attribute']['method'])];
+        
+        // make sure sent data contain the correct ticket (from this instance of this class)
+        // if it does not contain the correct ticket, sent data is from another form or source
+        if  (
+                    !isset($_SESSION[$this->_sSessionPrefix][$this->_sIdentifier]['ticket']) 
+                ||  (
+                            null !== $aRequest 
+                        &&  !isset($aRequest[$_SESSION[$this->_sSessionPrefix][$this->_sIdentifier]['ticket']])
+                    )                    
+            )
+        {
+            return array();
+        }            
 
         if (null !== $aRequest)
         {
             return $aRequest;
         }
-
+        
         return array();
 	}
-
+    
     /**
      * returns data handled by check
      * @access public
@@ -448,7 +485,7 @@ class Phormix
      * sets session prefix
      * @access public
      * @param string $sSessionPrefix
-     * @return $this
+     * @return \Phormix
      */
 	public function setSessionPrefix($sSessionPrefix = '')
     {
@@ -562,8 +599,16 @@ class Phormix
 		// walk config elements
 		foreach ($this->_aConfig['element'] as $iKey => $aElement)
 		{
-            // if element has type=file, we need to look at $_FILES
-			$aFormData = (isset($aElement['attribute']['type']) && strtolower(trim($aElement['attribute']['type'])) === 'file') ? $_FILES : $this->getFormDataArray();
+            // if element has type=file, we need to look at $_FILES            
+            if (isset($aElement['attribute']['type']) && strtolower(trim($aElement['attribute']['type'])) === 'file')
+            {
+                $aFormData = $_FILES;
+            }
+            else
+            {
+                $aFormData = $this->getFormDataArray();
+                $this->_aFormData = $aFormData;
+            }
 
 			// get element name
 			$sElementName = $aElement['attribute']['name'];
@@ -600,21 +645,22 @@ class Phormix
                         $oInstance =  $oReflectionClass->newInstanceWithoutConstructor();
                         $bElementIsValid = $oInstance->$sMyMthod($aFormData[$sElementName], $aValidate['value']);
                         
-                        $sIdentifier = (array_key_exists('label', $aElement)) ? $aElement['label'] : $aElement['name'];
+                        $sElementLabelOrName = (array_key_exists('label', $aElement)) ? $aElement['label'] : $aElement['name'];
                         
                         if (true === $aElement['attribute']['required'] && false === $bElementIsValid)
                         {
                             // add error
-                            $this->_aError[$aElement['attribute']['name']] =  (array_key_exists('fail', $aValidate['message'])) ? '"' . $sIdentifier . '": ' . sprintf($aValidate['message']['fail'], $aValidate['value']) : '`' . $aElement['label'] . '` is invalid.';
-                            self::LOG("FAIL\t" . 'Validate ' . $sMyMthod . '(' . $aFormData[$sElementName] . ', ' . json_encode($aValidate['value']) . ')' . ' [$sElementName: ' . $sElementName . ']');
-                            
+                            $this->_aError[$aElement['attribute']['name']] =  (array_key_exists('fail', $aValidate['message'])) ? '"' . $sElementLabelOrName . '": ' . sprintf($aValidate['message']['fail'], $aValidate['value']) : '`' . $aElement['label'] . '` is invalid.';
+                            self::LOG("FAIL\t" . 'Validate ' . $sMyMthod . '(' . (is_array($aFormData[$sElementName]) ? http_build_query($aFormData[$sElementName], '_', ', ') : $aFormData[$sElementName]) . ', ' . json_encode($aValidate['value']) . ')' . ' [$sElementName: ' . $sElementName . ']');
+           
+
                             return false;
                         }
                         elseif (true === $aElement['attribute']['required'] && true === $bElementIsValid)
                         {
                             // add message
-                            $this->_aMessage[$aElement['attribute']['name']]['validate'][$sMyMthod] =  (array_key_exists('success', $aValidate['message'])) ? '"' . $sIdentifier . '": ' . sprintf($aValidate['message']['success'], $aValidate['value']) : '`' . $aElement['label'] . '` is valid.';
-                            self::LOG("SUCCESS\t" . 'Validate ' . $sMyMthod . '(' . $aFormData[$sElementName] . ', ' . json_encode($aValidate['value']) . ')' . ' [$sElementName: ' . $sElementName . ']');
+                            $this->_aMessage[$aElement['attribute']['name']]['validate'][$sMyMthod] =  (array_key_exists('success', $aValidate['message'])) ? '"' . $sElementLabelOrName . '": ' . sprintf($aValidate['message']['success'], $aValidate['value']) : '`' . $aElement['label'] . '` is valid.';
+                            self::LOG("SUCCESS\t" . 'Validate ' . $sMyMthod . '(' . (is_array($aFormData[$sElementName]) ? http_build_query($aFormData[$sElementName], '_', ', ') : $aFormData[$sElementName]) . ', ' . json_encode($aValidate['value']) . ')' . ' [$sElementName: ' . $sElementName . ']');
                         }
                     }
                     else
@@ -647,17 +693,25 @@ class Phormix
                         $sSanitized = $oInstance->$sMyMthod($aFormData[$sElementName], $aSanitize['value']);                        
                         $sIdentifier = (array_key_exists('label', $aElement)) ? $aElement['label'] : $aElement['name'];
 						
-                        $aFormData[$sElementName] = $sSanitized;					
 						$this->_aFormDataChecked[$sElementName] = $sSanitized;
 						
-                        $this->_aMessage[$aElement['attribute']['name']]['sanitize'][$sMyMthod] =  (array_key_exists('success', $aSanitize['message'])) ? '"' . $sIdentifier . '": ' . $aSanitize['message']['success'] : '`' . $aElement['label'] . '` is valid.';
-						self::LOG("SUCCESS\t" . 'Sanitize ' . $sMyMthod . '(' . $sElementName . ' =>  ' . $sKey . ': ' . json_encode($aSanitize) . '): `' . $sSanitized . '`');
+                        if ($aFormData[$sElementName] === $sSanitized)
+                        {
+                            $this->_aMessage[$aElement['attribute']['name']]['sanitize'][$sMyMthod] =  (array_key_exists('success', $aSanitize['message'])) ? '"' . $sElementLabelOrName . '": ' . sprintf($aSanitize['message']['success'], $aSanitize['value']) : '`' . $aElement['label'] . '` is valid.';
+                        }
+                        else
+                        {
+                            $this->_aMessage[$aElement['attribute']['name']]['sanitize'][$sMyMthod] =  (array_key_exists('fail', $aSanitize['message'])) ? '"' . $sElementLabelOrName . '": ' . sprintf($aSanitize['message']['fail'], $aSanitize['value']) : '`' . $aElement['label'] . '` is invalid.';
+                        }
+                        
+                        $aFormData[$sElementName] = $sSanitized;					                        
+						self::LOG("SUCCESS\t" . 'Sanitize ' . $sMyMthod . '(' . $sElementName . ' =>  ' . $sKey . ': ' . json_encode($aSanitize) . '): `' . json_encode($sSanitized) . '`');
                     }                    
 				}
 			}						
 		}
 
-        self::LOG("INFO\t" . 'Field "' . $sElementName . '" succeeded (' . $sElementName . '=' . $aFormData[$sElementName] . ')' . ' [$sElementName: ' . $sElementName . ']');	
+        self::LOG("INFO\t" . 'Field "' . $sElementName . '" succeeded (' . $sElementName . '=' . (is_array($aFormData[$sElementName]) ? http_build_query($aFormData[$sElementName], '_', ', ') : $aFormData[$sElementName]) . ')' . ' [$sElementName: ' . $sElementName . ']');	
         
 		return true;
 	}

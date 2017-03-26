@@ -17,12 +17,12 @@ class PhormixValidate
     /**
 	 * validates on minimum length 
 	 * @param string $sFieldValue
-	 * @param integer $iValue
+	 * @param integer $iMinlength
 	 * @return boolean success
 	 */
-	public static function _MINLENGTH($sFieldValue, $iValue)
+	public static function _MINLENGTH($sFieldValue, $iMinlength)
 	{
-		if (mb_strlen($sFieldValue) < $iValue)
+		if (mb_strlen($sFieldValue) < $iMinlength)
 		{
 			return false;
 		}
@@ -33,12 +33,12 @@ class PhormixValidate
     /**
      * validates on maxlength
      * @param string $sFieldValue
-     * @param integer $iValue
+     * @param integer $iMaxlength
      * @return boolean
      */
-	public static function _MAXLENGTH($sFieldValue, $iValue)
+	public static function _MAXLENGTH($sFieldValue, $iMaxlength)
 	{
-		if (strlen($sFieldValue) > $iValue)
+		if (strlen($sFieldValue) > $iMaxlength)
 		{
 			return false;
 		}
@@ -96,10 +96,9 @@ class PhormixValidate
     /**
      * validates file access
      * @param array $aFiles
-     * @param boolean $bValidate
      * @return boolean
      */
-	public static function _FILE($aFiles, $bValidate)
+	public static function _FILE($aFiles)
 	{
 		if (!is_array($aFiles))
 		{
@@ -129,7 +128,7 @@ class PhormixValidate
      */
 	public static function _FILETYPE($aFiles, $aValid)
 	{
-        if (false === self::_file($aFiles, $bValidate))
+        if (false === self::_file($aFiles))
         {
             return false;
         }
@@ -151,18 +150,18 @@ class PhormixValidate
     /**
      * validates max filesize of file
      * @param array $aFiles
-     * @param boolean $bValidate
+     * @param integer $iMaxfilesize
      * @return boolean
      */
-	public static function _FILEMAXFILESIZE($aFiles, $bValidate)
+	public static function _FILEMAXFILESIZE($aFiles, $iMaxfilesize)
 	{
-        if (false === self::_file($aFiles, $bValidate))
+        if (false === self::_file($aFiles))
         {
             return false;
         }
         
         // check size
-        if  ($aFiles['size'] > $bValidate)
+        if  ($aFiles['size'] > $iMaxfilesize)
         {
             return false;
         }
