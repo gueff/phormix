@@ -185,7 +185,7 @@ class Phormix
         $this->_setSessionInfos();
         
         // overwrite global
-        $GLOBALS['_' . strtoupper($this->_aConfig['attribute']['method'])] = $this->getFormDataArray();
+        $GLOBALS['_' . strtoupper($this->_aConfig['method'])] = $this->getFormDataArray();
             
         return $this;
     }
@@ -375,7 +375,7 @@ class Phormix
         }    
  
         // get data sent by form
-        $aRequest = $GLOBALS['_' . strtoupper($this->_aConfig['attribute']['method'])];
+        $aRequest = $GLOBALS['_' . strtoupper($this->_aConfig['method'])];
         
         // make sure sent data contain the correct ticket (from this instance of this class)
         // if it does not contain the correct ticket, sent data is from another form or source
