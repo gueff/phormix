@@ -610,17 +610,40 @@ class Phormix
                 $this->_aFormData = $aFormData;
             }
 
+			/**
+			 * check for 
+			 * essential attributes:
+			 * 
+			 * - name
+			 * - required
+			 */
+			if (!isset($aElement['attribute']['name']))
+			{
+				$this->_aError[8888] = 'missing attribute: $aElement[' . $iKey . '][attribute][name]';
+				self::LOG("FAIL\t" . 'missing attribute: $aElement[' . $iKey . '][attribute][name]');				
+
+				return false;
+			}
+
+			if (!isset($aElement['attribute']['required']))
+			{
+				$this->_aError[9999] = 'missing attribute: $aElement[' . $iKey . '][attribute][required]';
+				self::LOG("FAIL\t" . 'missing attribute: $aElement[' . $iKey . '][attribute][required]');				
+
+				return false;
+			}
+			
 			// get element name
 			$sElementName = $aElement['attribute']['name'];
 			
 			// per config expected Element is required=true
 			// and is not in sent data
-            $bKeyExists = array_key_exists($sElementName, $aFormData);
+                        $bKeyExists = array_key_exists($sElementName, $aFormData);
             
 			if	(true === $aElement['attribute']['required'] && false === $bKeyExists)
 			{
-                $this->_aMissing[$iKey] = $this->_aConfig['element'][$iKey];
-				self::LOG("FAIL\t" . 'missing Element: ' . $sElementName);				
+                        $this->_aMissing[$iKey] = $this->_aConfig['element'][$iKey];
+				self::LOG("FAIL\t" . 'missing Element: ' . $iKey . '[' . $sElementName . ']');				
                 
 				return false;
 			}
