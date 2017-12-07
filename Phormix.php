@@ -42,103 +42,102 @@ class Phormix
 {
 	/**
 	 * sesison prefix / namespace
-	 * @var string 
      * @access protected
+	 * @var string 
 	 */
 	protected $_sSessionPrefix = 'Phormix';
 	
 	/**
 	 * config
-	 * @var array
      * @access protected
+	 * @var array
 	 */
 	protected $_aConfig = array();
 	
 	/**
 	 * error
-	 * @var array
      * @access protected
+	 * @var array
 	 */
 	protected $_aError = array();
 	
 	/**
 	 * message
-	 * @var array
      * @access protected
+	 * @var array
 	 */
 	protected $_aMessage = array();
 	
 	/**
 	 * missing
-	 * @var array
      * @access protected
+	 * @var array
 	 */
 	protected $_aMissing = array();
 
 	/**
 	 * status as result of check() method
-	 * @var boolean
      * @access protected
+	 * @var boolean
 	 */
 	protected $_bStatus = false;
 	
 	/**
 	 * ticket
-	 * @var string
      * @access public
+	 * @var string
 	 */
 	public $sTicket = '';
 	
 	/**
 	 * unique identifier
-	 * @var string
      * @access protected
+	 * @var string
 	 */
 	protected $_sIdentifier = '';
 
     /**
      * runtime log
-     * @var array
      * @access protected
+     * @var array
      */
     protected static $_aLog = array();
 
     /**
      * name of validate class
-     * @var string
      * @access protected
+     * @var string
      */
     protected $_sValidate = '\PhormixValidate';
     
     /**
      * name of sanitize class
-     * @var string
      * @access protected
+     * @var string
      */
     protected $_sSanitize = '\PhormixSanitize';
     
     /**
      * prefix of methods in validate & sanitize classes
      * (prefix is necessary to avoid misusing php-reserved words as methodnames; e.g. "empty")
-     * @var string
      * @access protected
+     * @var string
      */
     protected $_sMethodPrefix = '_';
     
 	/**
 	 * contains checked form data
-	 * @var array
      * @access private
+	 * @var array
 	 */
 	private $_aFormDataChecked = array();
 	
     /**
      * array containing sent data by form
-     * @var array
      * @access protected
+     * @var array
      */
-    protected $_aFormData = array();   
-    
+    protected $_aFormData = array();       
     
     /**
      * Phormix constructor.
@@ -149,219 +148,9 @@ class Phormix
         $this->startSession();
 	}
 
-    /**
-     * sets config array, sets identifier
-     * @access public
-     * @param string $sAbsPathToConfigFile absolute Path to configFile (JSON)
-     * @param string $sIdentifier Identifier | Default=md5($sAbsPathToConfigFile)
-     * @return \Phormix
-     */
-	public function init($sAbsPathToConfigFile = '', $sIdentifier = '')
-    {
-        $this->setConfigArrayFromJsonFile($sAbsPathToConfigFile);
-        $this->setIdentifier($sIdentifier);
-        
-        return $this;
-    }
-
-    /**
-     * runs check, renews ticket, saves to session
-     * @access public
-     * @return \Phormix
-     */
-	public function run()
-    {
-        // check Data
-        if (true === $this->checkFormSend ())
-        {
-            $this->_bStatus = $this->check();
-            self::LOG("INFO\t" . 'Status: ' . (int) $this->_bStatus);
-        }
-
-        // generate new ticket
-        $this->setTicket();
-
-        // save to session
-        $this->_setSessionInfos();
-        
-        // overwrite global
-        $GLOBALS['_' . strtoupper($this->_aConfig['method'])] = $this->getFormDataArray();
-            
-        return $this;
-    }
-
-    /**
-     * sets validate class name
-     * @access public
-     * @param string $sValidate
-     */
-    public function setValidateClass($sValidate)
-    {
-        $this->_sValidate = $sValidate;
-    }
-
-    /**
-     * sets sanitize class name
-     * @access public
-     * @param string $sSanitize
-     */
-    public function setSanitizeClass($sSanitize)
-    {
-        $this->_sSanitize = $sSanitize;
-    }
-    
-    /**
-     * sets config array
-     * @access public
-     * @param array $aConfig
-     * @return \Phormix
-     */
-	public function setConfigArray(array $aConfig = array())
-    {
-        $this->_aConfig = $aConfig;
-
-        return $this;
-    }
-
-    /**
-     * sets config array from a config JSON file
-     * @access public
-     * @param string $sAbsPathToConfigFile
-     * @return \Phormix
-     */
-    public function setConfigArrayFromJsonFile($sAbsPathToConfigFile = '')
-    {
-        if (!file_exists($sAbsPathToConfigFile))
-        {
-            return $this;
-        }
-
-        $this->_aConfig = json_decode(
-            file_get_contents($sAbsPathToConfigFile),
-            true // as Array
-        );
-
-        $this->_enrichConfig($this->_aConfig);
-
-        return $this;
-    }
-
-    /**
-     * sets identifier
-     * @access public
-     * @param string $sIdentifier
-     * @return \Phormix
-     */
-    public function setIdentifier ($sIdentifier = '')
-    {
-        $this->_sIdentifier = ($sIdentifier == '') ? md5(serialize($this->_aConfig)) : $sIdentifier;
-
-        return $this;
-    }
-
-    /**
-     * sets ticket
-     * @access public
-     * @param string $sTicket
-     */
-    public function setTicket($sTicket = '')
-    {
-        $this->sTicket = ('' === $sTicket) ? md5(uniqid() . microtime()) : $sTicket;
-    }
-
-    /**
-     * starts a session if none done yet
-     * @access public
-     */
-    public function startSession()
-    {
-        if ('' === session_id())
-        {
-            session_start();
-        }
-    }
-
-    /**
-     * adds an index to existing config array: key is the attribute:name of current element
-     * @access private
-     */
-    private function _enrichConfig()
-    {
-        foreach ($this->_aConfig['element'] as $iKey => $aValue)
-        {
-            $aValue['iKey'] = $iKey;
-            $this->_aConfig['index'][$aValue['attribute']['name']] = $aValue;
-        }
-    }
-
-    /**
-     * adds error to error array
-     * @access public
-     * @param string $sKey
-     * @param mixed $mValue
-     * @return boolean
-     */
-    public function addError($sKey = '', $mValue = '')        
-    {
-        if ('' === $sKey || '' === $mValue)
-        {
-            return false;
-        }
-        
-        $this->_aError[$sKey] = $mValue;       
-        
-        return true;
-    }
+	//--------------------------------------------------------------------------
+	// Getter
 	
-    /**
-     * adds message to message array
-     * @access public
-     * @param string $sKey
-     * @param mixed $mValue
-     * @return boolean
-     */
-    public function addMessage($sKey = '', $mValue = '')        
-    {
-        if ('' === $sKey || '' === $mValue)
-        {
-            return false;
-        }
-        
-        $this->_aMessage[$sKey] = $mValue;       
-        
-        return true;
-    }
-	
-    /**
-     * adds string to missing array
-     * @access public
-     * @param string $sKey
-     * @param mixed $mValue
-     * @return boolean
-     */
-    public function addMissing($sKey = '', $mValue = '')        
-    {
-        if ('' === $sKey || '' === $mValue)
-        {
-            return false;
-        }
-        
-        $this->_aMissing[$sKey] = $mValue;       
-        
-        return true;
-    }
-
-    /**
-     * inits session namespace, saves identifier + ticket to session namespace
-     * @access private
-     */
-    private function _setSessionInfos()
-	{
-		(!array_key_exists($this->_sSessionPrefix, $_SESSION)) ? $_SESSION[$this->_sSessionPrefix] = array() : false;		
-		$_SESSION[$this->_sSessionPrefix][$this->_sIdentifier] = array();
-		$_SESSION[$this->_sSessionPrefix][$this->_sIdentifier]['ticket'] = $this->sTicket;		
-	}
-
     /**
      * returns data sent by form
      * @access public
@@ -450,18 +239,6 @@ class Phormix
 	}    
 
     /**
-     * sets array(config) for an element, identified by its attribute-name
-     * @access public
-     * @param string $sElement
-     * @param array $aValue
-     */
-    public function setElementArrayByName($sElement = '', array $aValue = array())
-    {
-        $iElementKey = $this->_aConfig['index'][$sElement]['iKey'];
-        $this->_aConfig['element'][$iElementKey] = $aValue;
-    }
-
-    /**
      * returns complete confif array
      * @access public
      * @return array
@@ -480,19 +257,6 @@ class Phormix
 	{
 		return $this->_sIdentifier;
 	}
-
-    /**
-     * sets session prefix
-     * @access public
-     * @param string $sSessionPrefix
-     * @return \Phormix
-     */
-	public function setSessionPrefix($sSessionPrefix = '')
-    {
-        $this->_sSessionPrefix = $sSessionPrefix;
-
-        return $this;
-    }
 
     /**
      * returns session prefix
@@ -560,6 +324,184 @@ class Phormix
 	{
 		return $this->_aMissing;
 	}
+    
+    /**
+     * returns log entries
+     * @access public
+     * @return string
+     */
+    public function getLog()
+    {
+        return implode("\n", self::$_aLog);
+    }
+
+	//--------------------------------------------------------------------------
+	// Setter
+	
+    /**
+     * sets array(config) for an element, identified by its attribute-name
+     * @access public
+     * @param string $sElement
+     * @param array $aValue
+	 * @return void 
+     */
+    public function setElementArrayByName($sElement = '', array $aValue = array())
+    {
+        $iElementKey = $this->_aConfig['index'][$sElement]['iKey'];
+        $this->_aConfig['element'][$iElementKey] = $aValue;
+    }
+
+    /**
+     * sets session prefix
+     * @access public
+     * @param string $sSessionPrefix
+     * @return \Phormix
+     */
+	public function setSessionPrefix($sSessionPrefix = '')
+    {
+        $this->_sSessionPrefix = $sSessionPrefix;
+
+        return $this;
+    }
+
+    /**
+     * sets validate class name
+     * @access public
+     * @param string $sValidate
+	 * @return void 
+     */
+    public function setValidateClass($sValidate)
+    {
+        $this->_sValidate = $sValidate;
+    }
+
+    /**
+     * sets sanitize class name
+     * @access public
+     * @param string $sSanitize
+	 * @return void 
+     */
+    public function setSanitizeClass($sSanitize)
+    {
+        $this->_sSanitize = $sSanitize;
+    }
+    
+    /**
+     * sets config array
+     * @access public
+     * @param array $aConfig
+     * @return \Phormix
+     */
+	public function setConfigArray(array $aConfig = array())
+    {
+        $this->_aConfig = $aConfig;
+
+        return $this;
+    }
+
+    /**
+     * sets config array from a config JSON file
+     * @access public
+     * @param string $sAbsPathToConfigFile
+     * @return \Phormix
+     */
+    public function setConfigArrayFromJsonFile($sAbsPathToConfigFile = '')
+    {
+        if (!file_exists($sAbsPathToConfigFile))
+        {
+            return $this;
+        }
+
+        $this->_aConfig = json_decode(
+            file_get_contents($sAbsPathToConfigFile),
+            true // as Array
+        );
+
+        $this->_enrichConfig($this->_aConfig);
+
+        return $this;
+    }
+
+    /**
+     * sets identifier
+     * @access public
+     * @param string $sIdentifier
+     * @return \Phormix
+     */
+    public function setIdentifier ($sIdentifier = '')
+    {
+        $this->_sIdentifier = ($sIdentifier == '') ? md5(serialize($this->_aConfig)) : $sIdentifier;
+
+        return $this;
+    }
+
+    /**
+     * sets ticket
+     * @access public
+     * @param string $sTicket
+	 * @return void 
+     */
+    public function setTicket($sTicket = '')
+    {
+        $this->sTicket = ('' === $sTicket) ? md5(uniqid() . microtime()) : $sTicket;
+    }
+
+	//--------------------------------------------------------------------------
+	// etc
+	
+    /**
+     * sets config array, sets identifier
+     * @access public
+     * @param string $sAbsPathToConfigFile absolute Path to configFile (JSON)
+     * @param string $sIdentifier Identifier | Default=md5($sAbsPathToConfigFile)
+     * @return \Phormix
+     */
+	public function init($sAbsPathToConfigFile = '', $sIdentifier = '')
+    {
+        $this->setConfigArrayFromJsonFile($sAbsPathToConfigFile);
+        $this->setIdentifier($sIdentifier);
+        
+        return $this;
+    }
+
+    /**
+     * runs check, renews ticket, saves to session
+     * @access public
+     * @return \Phormix
+     */
+	public function run()
+    {
+        // check Data
+        if (true === $this->checkFormSend ())
+        {
+            $this->_bStatus = $this->check();
+            self::addLog("INFO\t" . 'Status: ' . (int) $this->_bStatus);
+        }
+
+        // generate new ticket
+        $this->setTicket();
+
+        // save to session
+        $this->_setSessionInfos();
+        
+        // overwrite global
+        $GLOBALS['_' . strtoupper($this->_aConfig['method'])] = $this->getFormDataArray();
+            
+        return $this;
+    }
+
+    /**
+     * starts a session if none done yet
+     * @access public
+	 * @return void 
+     */
+    public function startSession()
+    {
+        if ('' === session_id())
+        {
+            session_start();
+        }
+    }
 
     /**
      * checks form was sent
@@ -620,7 +562,7 @@ class Phormix
 			if (!isset($aElement['attribute']['name']))
 			{
 				$this->_aError[8888] = 'missing attribute: $aElement[' . $iKey . '][attribute][name]';
-				self::LOG("FAIL\t" . 'missing attribute: $aElement[' . $iKey . '][attribute][name]');				
+				self::addLog("FAIL\t" . 'missing attribute: $aElement[' . $iKey . '][attribute][name]');				
 
 				return false;
 			}
@@ -628,7 +570,7 @@ class Phormix
 			if (!isset($aElement['attribute']['required']))
 			{
 				$this->_aError[9999] = 'missing attribute: $aElement[' . $iKey . '][attribute][required]';
-				self::LOG("FAIL\t" . 'missing attribute: $aElement[' . $iKey . '][attribute][required]');				
+				self::addLog("FAIL\t" . 'missing attribute: $aElement[' . $iKey . '][attribute][required]');				
 
 				return false;
 			}
@@ -638,22 +580,38 @@ class Phormix
 			
 			// per config expected Element is required=true
 			// and is not in sent data
-                        $bKeyExists = array_key_exists($sElementName, $aFormData);
+			$bKeyExists = array_key_exists($sElementName, $aFormData);
             
 			if	(true === $aElement['attribute']['required'] && false === $bKeyExists)
 			{
-                        $this->_aMissing[$iKey] = $this->_aConfig['element'][$iKey];
-				self::LOG("FAIL\t" . 'missing Element: ' . $iKey . '[' . $sElementName . ']');				
+				$this->_aMissing[$iKey] = $this->_aConfig['element'][$iKey];
+				self::addLog("FAIL\t" . 'missing Element: ' . $iKey . '[' . $sElementName . ']');				
                 
 				return false;
 			}
 
-			// Validate
+			// Validate if: 
+			// required:true 
+			// OR
+			// required:false BUT input is given by that element
 			if	(
+						// things that must be given
 						array_key_exists('required', $aElement['attribute']) 
 					&&	array_key_exists('filter', $aElement) 
 					&&	array_key_exists('validate', $aElement['filter']) 
-					&&	true === $aElement['attribute']['required']
+						
+					&&	(
+								// required:true
+								true === $aElement['attribute']['required']
+						
+								// required:false BUT input is given by that element
+							||	(
+										false === $aElement['attribute']['required']
+									&&	true ===  (isset($this->_aConfig['index'][$sElementName]))	# Element exists in config
+									&&	true === (isset($aFormData[$sElementName]))					# Element was sent by form
+									&&	!empty($aFormData[$sElementName])							# Data sent not empty
+								)
+						)
 				)
 			{				                
 				foreach ($aElement['filter']['validate'] as $sKey => $aValidate)
@@ -667,28 +625,27 @@ class Phormix
                         $oReflectionClass = new \ReflectionClass($this->_sValidate);
                         $oInstance =  $oReflectionClass->newInstanceWithoutConstructor();
                         $bElementIsValid = $oInstance->$sMyMthod($aFormData[$sElementName], $aValidate['value']);
-                        
+						
                         $sElementLabelOrName = (array_key_exists('label', $aElement)) ? $aElement['label'] : $aElement['name'];
                         
-                        if (true === $aElement['attribute']['required'] && false === $bElementIsValid)
+                        if (false === $bElementIsValid)
                         {
                             // add error
                             $this->_aError[$aElement['attribute']['name']] =  (array_key_exists('fail', $aValidate['message'])) ? '"' . $sElementLabelOrName . '": ' . sprintf($aValidate['message']['fail'], $aValidate['value']) : '`' . $aElement['label'] . '` is invalid.';
-                            self::LOG("FAIL\t" . 'Validate ' . $sMyMthod . '(' . (is_array($aFormData[$sElementName]) ? http_build_query($aFormData[$sElementName], '_', ', ') : $aFormData[$sElementName]) . ', ' . json_encode($aValidate['value']) . ')' . ' [$sElementName: ' . $sElementName . ']');
+                            self::addLog("FAIL\t" . 'Validate ' . $sMyMthod . '(' . (is_array($aFormData[$sElementName]) ? http_build_query($aFormData[$sElementName], '_', ', ') : $aFormData[$sElementName]) . ', ' . json_encode($aValidate['value']) . ')' . ' [$sElementName: ' . $sElementName . ']');
            
-
                             return false;
                         }
-                        elseif (true === $aElement['attribute']['required'] && true === $bElementIsValid)
+                        elseif (true === $bElementIsValid)
                         {
                             // add message
                             $this->_aMessage[$aElement['attribute']['name']]['validate'][$sMyMthod] =  (array_key_exists('success', $aValidate['message'])) ? '"' . $sElementLabelOrName . '": ' . sprintf($aValidate['message']['success'], $aValidate['value']) : '`' . $aElement['label'] . '` is valid.';
-                            self::LOG("SUCCESS\t" . 'Validate ' . $sMyMthod . '(' . (is_array($aFormData[$sElementName]) ? http_build_query($aFormData[$sElementName], '_', ', ') : $aFormData[$sElementName]) . ', ' . json_encode($aValidate['value']) . ')' . ' [$sElementName: ' . $sElementName . ']');
+                            self::addLog("SUCCESS\t" . 'Validate ' . $sMyMthod . '(' . (is_array($aFormData[$sElementName]) ? http_build_query($aFormData[$sElementName], '_', ', ') : $aFormData[$sElementName]) . ', ' . json_encode($aValidate['value']) . ')' . ' [$sElementName: ' . $sElementName . ']');
                         }
                     }
                     else
                     {
-                        self::LOG("FAIL\t" . 'missing "value" on Validator: ' . $sKey . ' [$sElementName: ' . $sElementName . ']');	
+                        self::addLog("FAIL\t" . 'missing "value" on Validator: ' . $sKey . ' [$sElementName: ' . $sElementName . ']');	
                     }
 				}
 			}
@@ -696,7 +653,7 @@ class Phormix
 			// add first time as the validates has been passed
 			$this->_aFormDataChecked[$sElementName] = $aFormData[$sElementName];
 			
-			// Sanitize
+			// Sanitize: always
 			if	(
 						array_key_exists('filter', $aElement) 
 					&&	array_key_exists('sanitize', $aElement['filter']) 
@@ -728,22 +685,115 @@ class Phormix
                         }
                         
                         $aFormData[$sElementName] = $sSanitized;					                        
-						self::LOG("SUCCESS\t" . 'Sanitize ' . $sMyMthod . '(' . $sElementName . ' =>  ' . $sKey . ': ' . json_encode($aSanitize) . '): `' . json_encode($sSanitized) . '`');
+						self::addLog("SUCCESS\t" . 'Sanitize ' . $sMyMthod . '(' . $sElementName . ' =>  ' . $sKey . ': ' . json_encode($aSanitize) . '): `' . json_encode($sSanitized) . '`');
                     }                    
 				}
 			}						
 		}
 
-        self::LOG("INFO\t" . 'Field "' . $sElementName . '" succeeded (' . $sElementName . '=' . (is_array($aFormData[$sElementName]) ? http_build_query($aFormData[$sElementName], '_', ', ') : $aFormData[$sElementName]) . ')' . ' [$sElementName: ' . $sElementName . ']');	
+        self::addLog("INFO\t" . 'Field "' . $sElementName . '" succeeded (' . $sElementName . '=' . (is_array($aFormData[$sElementName]) ? http_build_query($aFormData[$sElementName], '_', ', ') : $aFormData[$sElementName]) . ')' . ' [$sElementName: ' . $sElementName . ']');	
         
 		return true;
+	}
+
+    /**
+     * adds error to error array
+     * @access public
+     * @param string $sKey
+     * @param mixed $mValue
+     * @return boolean success
+     */
+    public function addError($sKey = '', $mValue = '')        
+    {
+        if ('' === $sKey || '' === $mValue)
+        {
+            return false;
+        }
+        
+        $this->_aError[$sKey] = $mValue;       
+        
+        return true;
+    }
+	
+    /**
+     * adds message to message array
+     * @access public
+     * @param string $sKey
+     * @param mixed $mValue
+     * @return boolean success
+     */
+    public function addMessage($sKey = '', $mValue = '')        
+    {
+        if ('' === $sKey || '' === $mValue)
+        {
+            return false;
+        }
+        
+        $this->_aMessage[$sKey] = $mValue;       
+        
+        return true;
+    }
+	
+    /**
+     * adds string to missing array
+     * @access public
+     * @param string $sKey
+     * @param mixed $mValue
+     * @return boolean success
+     */
+    public function addMissing($sKey = '', $mValue = '')        
+    {
+        if ('' === $sKey || '' === $mValue)
+        {
+            return false;
+        }
+        
+        $this->_aMissing[$sKey] = $mValue;       
+        
+        return true;
+    }
+    
+    /**
+     * logs info into internal array
+     * @access public
+     * @param string $sString
+     */
+    public static function addLog ($sString = '')
+    {
+        self::$_aLog[] = $sString;
+    }
+
+    /**
+     * adds an index to existing config array: key is the attribute:name of current element
+     * @access private
+	 * @return void 
+     */
+    private function _enrichConfig()
+    {
+        foreach ($this->_aConfig['element'] as $iKey => $aValue)
+        {
+            $aValue['iKey'] = $iKey;
+            $this->_aConfig['index'][$aValue['attribute']['name']] = $aValue;
+        }
+    }
+	
+    /**
+     * inits session namespace, saves identifier + ticket to session namespace
+     * @access private
+	 * @return void 
+     */
+    private function _setSessionInfos()
+	{
+		(!array_key_exists($this->_sSessionPrefix, $_SESSION)) ? $_SESSION[$this->_sSessionPrefix] = array() : false;		
+		$_SESSION[$this->_sSessionPrefix][$this->_sIdentifier] = array();
+		$_SESSION[$this->_sSessionPrefix][$this->_sIdentifier]['ticket'] = $this->sTicket;		
 	}
 
     /**
      * checks existance of expected ticket
      * @access private
      * @param string $sTicket
-     * @return boolean
+     * @return boolean success
      */
 	private function _checkTicket ($sTicket = '')
 	{
@@ -756,26 +806,5 @@ class Phormix
 		}
 		
 		return true;
-	}
-    
-    /**
-     * logs info into internal array
-     * @access public
-     * @param string $sString
-     */
-    public static function LOG ($sString = '')
-    {
-        self::$_aLog[] = $sString;
-    }
-    
-    /**
-     * returns log entries
-     * @access public
-     * @return string
-     */
-    public function getLog()
-    {
-        return implode("\n", self::$_aLog);
-    }
-		
+	}		
 }
