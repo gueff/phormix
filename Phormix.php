@@ -690,8 +690,6 @@ class Phormix
 				}
 			}						
 		}
-
-        self::addLog("INFO\t" . 'Field "' . $sElementName . '" succeeded (' . $sElementName . '=' . (is_array($aFormData[$sElementName]) ? http_build_query($aFormData[$sElementName], '_', ', ') : $aFormData[$sElementName]) . ')' . ' [$sElementName: ' . $sElementName . ']');	
         
 		return true;
 	}
