@@ -177,7 +177,7 @@ class PhormixValidate
      */
 	public static function _EMAIL($sFieldValue, $aData)
 	{
-        $bValid = filter_var($sFieldValue, FILTER_VALIDATE_EMAIL);
+        $bValid = (boolean) filter_var($sFieldValue, FILTER_VALIDATE_EMAIL);
         
         return $bValid;
 	}
