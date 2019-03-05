@@ -127,10 +127,10 @@ class Phormix
     
 	/**
 	 * contains checked form data
-     * @access private
+     * @access protected
 	 * @var array
 	 */
-	private $_aFormDataChecked = array();
+	protected $_aFormDataChecked = array();
 	
     /**
      * array containing sent data by form
@@ -763,10 +763,10 @@ class Phormix
 
     /**
      * adds an index to existing config array: key is the attribute:name of current element
-     * @access private
+     * @access protected
 	 * @return void 
      */
-    private function _enrichConfig()
+    protected function _enrichConfig()
     {
         foreach ($this->_aConfig['element'] as $iKey => $aValue)
         {
@@ -777,10 +777,10 @@ class Phormix
 	
     /**
      * inits session namespace, saves identifier + ticket to session namespace
-     * @access private
+     * @access protected
 	 * @return void 
      */
-    private function _setSessionInfos()
+    protected function _setSessionInfos()
 	{
 		(!array_key_exists($this->_sSessionPrefix, $_SESSION)) ? $_SESSION[$this->_sSessionPrefix] = array() : false;		
 		$_SESSION[$this->_sSessionPrefix][$this->_sIdentifier] = array();
@@ -789,11 +789,11 @@ class Phormix
 
     /**
      * checks existance of expected ticket
-     * @access private
+     * @access protected
      * @param string $sTicket
      * @return boolean success
      */
-	private function _checkTicket ($sTicket = '')
+	protected function _checkTicket ($sTicket = '')
 	{
 		$aFormMethod = $this->getFormDataArray(); // e.g. $_POST
         
